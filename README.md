@@ -17,11 +17,11 @@ This example can be used with OpenShift's Source-To-Build technology.
 To run it standalone use
 
 ```
-s2i build . fabric8/sti-java-jboss-jdk8:1.0.5 fabric8/camel-cdi
+s2i build . fabric8/sti-java-jboss-jdk8:1.0.6 fabric8/camel-cdi
 ```
 
 To run it within os3
 
 ```
-oc new-app --strategy=source fabric8/sti-java-jboss-jdk8:1.0.5~https://github.com/rhuss/sti-camel-cdi.git
+oc new-app --strategy=source fabric8/sti-java-jboss-jdk8:1.0.6~https://github.com/rhuss/sti-camel-cdi.git
 ```
