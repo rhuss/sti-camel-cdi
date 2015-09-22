@@ -25,3 +25,15 @@ To run it within os3
 ```
 oc new-app --strategy=source fabric8/sti-java-jboss-jdk8:1.0.6~https://github.com/rhuss/sti-camel-cdi.git
 ```
+
+or you can also use the provided `create-app.yml`:
+
+```
+oc create -f create-app.yml
+```
+
+In order to delete all objects associated with this app, do a 
+
+```
+oc delete all -l app=sti-camel-cdi
+```
