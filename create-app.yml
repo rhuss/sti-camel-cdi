@@ -43,9 +43,6 @@ items:
         from:
           kind: ImageStreamTag
           name: sti-java-jboss-jdk8:1.0.6
-        env:
-          - name: "BUILD_LOGLEVEL"
-            value: 5
         forcePull: false
       type: Source
     triggers:
