@@ -8,7 +8,7 @@ items:
       app: sti-camel-cdi
     name: sti-java-jboss-jdk8
   spec:
-    dockerImageRepository: fabric8/sti-java-jboss-jdk8:1.0.6
+    dockerImageRepository: fabric8/sti-java-jboss-jdk8:latest
   status:
     dockerImageRepository: ""
 - apiVersion: v1
@@ -42,7 +42,7 @@ items:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: sti-java-jboss-jdk8:1.0.6
+          name: sti-java-jboss-jdk8:latest
         env:
           - name: "BUILD_LOGLEVEL"
             value: "5"
