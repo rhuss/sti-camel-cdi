@@ -1,5 +1,23 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+     Copyright 2005-2015 Red Hat, Inc.
+
+     Red Hat licenses this file to you under the Apache License, version
+     2.0 (the "License"); you may not use this file except in compliance
+     with the License.  You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+     implied.  See the License for the specific language governing
+     permissions and limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -8,39 +26,26 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Fabric8 :: Quickstarts :: Java :: Camel CDI</name>
-  <description>Camel route using CDI in a standalone Java Container</description>
+  <name>Fabric8 :: STI Demo : CDI :: Camel</name>
+  <description>Camel route using CDI in a standalone Java Container (STI demo)</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.compiler.plugin>2.3.1</version.compiler.plugin>
-    <version.maven-bundle-plugin>2.3.7</version.maven-bundle-plugin>
-    <maven.compiler.target>1.7</maven.compiler.target>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.surefire.plugin.version>2.17</maven.surefire.plugin.version>
-
-    <skipTests>false</skipTests>
-    <integrationTestPattern>**/*KubernetesTest.java</integrationTestPattern>
 
     <!-- the version of the BOM, defining all the dependency versions -->
-    <fabric8.version>2.2.29</fabric8.version>
+    <fabric8.version>2.2.46</fabric8.version>
+    <hawtapp.version>2.2.48-SNAPSHOT</hawtapp.version>
+    <docker.maven.plugin.version>0.13.6-SNAPSHOT</docker.maven.plugin.version>
 
-    <!-- versions for use in mvn plugins as we cannot inherit them from a BOM -->
-    <camel.version>2.15.2</camel.version>
-    <jube.version>2.2.0</jube.version>
-    <docker.maven.plugin.version>0.13.3</docker.maven.plugin.version>
+    <camel.version>2.15.3</camel.version>
+    <hawt-app.maven.plugin.version>2.2.48-SNAPSHOT</hawt-app.maven.plugin.version>
 
-    <docker.from>docker.io/fabric8/java</docker.from>
-
+    <!-- Docker & Fabric8 Configs -->
+    <docker.from>fabric8/sti-java-jboss-jdk8:latest</docker.from>
     <fabric8.dockerPrefix>docker.io/</fabric8.dockerPrefix>
     <fabric8.dockerUser>fabric8/</fabric8.dockerUser>
     <docker.image>${fabric8.dockerPrefix}${fabric8.dockerUser}${project.artifactId}:${project.version}</docker.image>
-    <docker.assemblyDescriptorRef>artifact-with-dependencies</docker.assemblyDescriptorRef>
     <docker.port.container.jolokia>8778</docker.port.container.jolokia>
-    <docker.env.MAIN>org.apache.camel.cdi.Main</docker.env.MAIN>
-
-    <fabric8.service.name>qs-java-camel-cdi</fabric8.service.name>
-    <fabric8.service.headless>true</fabric8.service.headless>
 
     <fabric8.metrics.scrape>true</fabric8.metrics.scrape>
     <fabric8.metrics.port>9779</fabric8.metrics.port>
@@ -67,7 +72,14 @@
 
     <dependency>
       <groupId>org.apache.camel</groupId>
+      <artifactId>camel-core</artifactId>
+      <version>${camel.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.camel</groupId>
       <artifactId>camel-cdi</artifactId>
+      <version>${camel.version}</version>
     </dependency>
 
     <!-- cdi api -->
@@ -129,32 +141,24 @@
   <build>
     <finalName>${project.artifactId}</finalName>
 
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-
     <plugins>
       <!-- Compiler plugin enforces Java 1.7 compatibility and activates annotation processors -->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>${version.compiler.plugin}</version>
+        <version>3.3</version>
         <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
+          <source>1.7</source>
+          <target>1.7</target>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>${maven.surefire.plugin.version}</version>
+        <version>2.18.1</version>
         <inherited>true</inherited>
         <configuration>
-          <skipTests>${skipTests}</skipTests>
           <excludes>
-            <exclude>${integrationTestPattern}</exclude>
+            <exclude>**/*KT.java</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -182,6 +186,23 @@
       </plugin>
 
       <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>hawt-app-maven-plugin</artifactId>
+        <version>${hawtapp.version}</version>
+        <executions>
+          <execution>
+            <id>hawt-app</id>
+            <goals>
+              <goal>build</goal>
+            </goals>
+            <configuration>
+              <javaMainClass>org.apache.camel.cdi.Main</javaMainClass>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.jolokia</groupId>
         <artifactId>docker-maven-plugin</artifactId>
         <version>${docker.maven.plugin.version}</version>
@@ -192,117 +213,66 @@
               <build>
                 <from>${docker.from}</from>
                 <assembly>
-                  <descriptorRef>${docker.assemblyDescriptorRef}</descriptorRef>
+                  <basedir>/deployments/hawt-app</basedir>
+                  <descriptorRef>hawt-app</descriptorRef>
                 </assembly>
                 <env>
-                  <MAIN>${docker.env.MAIN}</MAIN>
+                  <JAVA_LIB_DIR>/deployments/hawt-app/lib</JAVA_LIB_DIR>
+                  <JAVA_MAIN_CLASS>org.apache.camel.cdi.Main</JAVA_MAIN_CLASS>
                 </env>
               </build>
             </image>
           </images>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>io.fabric8.jube</groupId>
-        <artifactId>jube-maven-plugin</artifactId>
-        <version>${jube.version}</version>
-      </plugin>
 
       <!-- allows the route to be ran via 'mvn exec:java' -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
+        <version>1.4.0</version>
         <configuration>
           <mainClass>org.apache.camel.cdi.Main</mainClass>
           <includePluginDependencies>false</includePluginDependencies>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
 
+   <!--
+  Default sample commands:
+
+  mvn -Pf8-build         ... build Docker images and create OpenShift deployment configs
+  mvn -Pf8-deploy        ... f8-build + push to Docker registry + applying deployment config to OpenShift
+  mvn -Pf8-single-deploy ... deployment for a single node setup without pushing to a registry
+
+  For individual goal usage please consult the fabric8 documentation
+  -->
   <profiles>
     <profile>
-      <id>docker-build</id>
+      <id>f8-build</id>
       <build>
-        <plugins>
-          <plugin>
-            <groupId>org.jolokia</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <version>${docker.maven.plugin.version}</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>build</goal>
-                </goals>
-                <phase>package</phase>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
+        <defaultGoal>clean install docker:build fabric8:json</defaultGoal>
       </build>
     </profile>
     <profile>
-      <id>docker-push</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.jolokia</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <version>${docker.maven.plugin.version}</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>build</goal>
-                  <goal>push</goal>
-                </goals>
-                <phase>package</phase>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>jube</id>
-      <activation>
-        <property>
-          <name>jube.plugin.enabled</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>io.fabric8.jube</groupId>
-            <artifactId>jube-maven-plugin</artifactId>
-            <version>${jube.version}</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>build</goal>
-                </goals>
-                <phase>package</phase>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>fabric8-snapshot</id>
+      <id>f8-deploy</id>
       <properties>
-        <fabric8.version>2.2.0.redhat-621018</fabric8.version>
+        <fabric8.recreate>true</fabric8.recreate>
       </properties>
+      <build>
+        <defaultGoal>clean install docker:build docker:push fabric8:json fabric8:apply</defaultGoal>
+      </build>
     </profile>
     <profile>
-      <id>ts.kube</id>
+      <id>f8-single-deploy</id>
       <properties>
-        <skipItests>false</skipItests>
+        <fabric8.recreate>true</fabric8.recreate>
       </properties>
+      <build>
+        <defaultGoal>clean install docker:build fabric8:json fabric8:apply</defaultGoal>
+      </build>
     </profile>
   </profiles>
+
 </project>

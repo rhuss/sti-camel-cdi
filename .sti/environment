@@ -1,3 +1,2 @@
 # Main class to use
-JAVA_MAIN_CLASS=org.apache.camel.cdi.Main
 BUILD_LOG_LEVEL=5
